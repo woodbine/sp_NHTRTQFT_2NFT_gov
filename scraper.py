@@ -84,7 +84,7 @@ def convert_mth_strings ( mth_string ):
 #### VARIABLES 1.0
 
 entity_id = "NHTRTQFT_2NFT_gov"
-url = "http://www.2gether.nhs.uk/search/?search=25000"
+url = "https://www.2gether.nhs.uk/freedom-of-information/what-we-spend/"
 errors = 0
 data = []
 
@@ -95,23 +95,16 @@ soup = BeautifulSoup(html, 'lxml')
 
 
 #### SCRAPE DATA
+import requests
 
-blocks = soup.find('div', 'cleftcol').find_all('a')
+blocks = soup.find('h4', text=re.compile('Expenditure greater than')).find_next('ul').find_all('a')
 for block in blocks:
     link = block['href']
-    current_html = urllib2.urlopen(link)
-    current_soup = BeautifulSoup(current_html, 'lxml')
-    try:
-        file_url = 'http://www.2gether.nhs.uk'+current_soup.find('div', id='content').find('a')['href']
-    except:
-        break
     title = block.text.strip()
-    csvMth = title.split()[-2][:3]
-    csvYr = title[-4:]
-    if 'More' in csvYr:
-        continue
+    csvMth = title.split()[0][:3]
+    csvYr = title.split()[1][-4:]
     csvMth = convert_mth_strings(csvMth.upper())
-    data.append([csvYr, csvMth, file_url])
+    data.append([csvYr, csvMth, link])
 
 
 #### STORE DATA 1.0
